@@ -1,25 +1,31 @@
 import React from 'react';
 import { Calendar, MapPin, Users } from 'lucide-react';
+// import poorna from "leaders/poorna.jpeg";
+// import mudith from "leaders/mudith.jpg";
+// import praboda from 'leaders/praboda.jpeg';
 
 const About = () => {
   const leaders = [
     {
-      name: "Michael Fernando",
+      name: "Poorna Madusanka",
       role: "Crew Leader",
-      since: "2020",
-      description: "Leading with dedication and innovation in scouting excellence."
+      since: "2016",
+      description: "Leading with dedication and innovation in scouting excellence.",
+      image: "/images/poorna.jpeg"
     },
     {
-      name: "Sarah Perera",
+      name: "Mudith Perera",
       role: "Assistant Crew Leader", 
-      since: "2021",
-      description: "Specialized in youth development and community engagement."
+      since: "2017",
+      description: "Specialized in youth development and community engagement.",
+      image: "/images/mudith.jpg"
     },
     {
-      name: "David Silva",
+      name: "Praboda Gamlath",
       role: "Training Coordinator",
-      since: "2019",
-      description: "Expert in scout craft and outdoor skills development."
+      since: "2020",
+      description: "Expert in scout craft and outdoor skills development.",
+      image: "/images/praboda.jpeg"
     }
   ];
 
@@ -92,11 +98,11 @@ const About = () => {
             {leaders.map((leader, index) => (
               <div key={index} className="text-center">
                 <div className="mb-4 relative">
-                  <img
-                    src={`/api/placeholder/200/200`}
-                    alt={leader.name}
-                    className="w-48 h-48 rounded-full mx-auto object-cover shadow-lg"
-                  />
+                <img
+                  src={leader.image}
+                  alt={leader.name}
+                  className="w-48 h-48 rounded-full mx-auto object-cover shadow-lg"
+                />
                 </div>
                 <h3 className="text-xl font-semibold mb-1">{leader.name}</h3>
                 <p className="text-blue-600 font-medium mb-2">{leader.role}</p>
@@ -112,11 +118,11 @@ const About = () => {
           <h2 className="text-2xl font-bold mb-6">Our Founder</h2>
           <div className="max-w-md mx-auto">
             <img
-              src="/api/placeholder/150/150"
-              alt="James Anderson"
-              className="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg"
+              src="/images/thummodara.jpeg"
+              alt="Sir Thummodara"
+              className="w-32 h-34 rounded-full mx-auto mb-4 shadow-lg"
             />
-            <h3 className="text-xl font-semibold mb-2">James Anderson</h3>
+            <h3 className="text-xl font-semibold mb-2">Sir Thummodara</h3>
             <p className="text-gray-600 mb-4">Founder, Established in 1928</p>
             <p className="text-gray-700">
               A visionary leader who established the Woodland District Rover Crew 
