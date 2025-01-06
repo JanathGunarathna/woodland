@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState,userRole } from 'react';
+import { ROLES } from '../components/ui/services/auth';
 
 const MyNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const showAdminControls = userRole === ROLES.ADMIN;
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

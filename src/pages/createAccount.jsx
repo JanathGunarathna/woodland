@@ -1,338 +1,257 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserPlusIcon, ImageIcon } from 'lucide-react';
-import LoginNavbar from './loginNavbar';
-import { authService } from '../services/authService';
+import axios from 'axios';
+import { Eye, EyeOff } from 'lucide-react';
+import LoginNavbar from "./loginNavbar";
 
-const CreateAccountPage = () => {
+const CreateAccount = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: '',
-    profilePicture: null,
+    role: 'teacher',
     address: '',
     roverRegistrationNumber: '',
     idNumber: '',
     crewOrSchool: ''
   });
-  
-  const [errors, setErrors] = useState({});
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [serverError, setServerError] = useState(null);
-  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Handle input changes
   const handleChange = (e) => {
-    const { id, value, files } = e.target;
-    
-    // Handle file upload separately
-    if (id === 'profilePicture') {
-      setFormData(prev => ({
-        ...prev,
-        profilePicture: files ? files[0] : null
-      }));
-      return;
-    }
-
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
-
-    // Clear specific field error when user starts typing
-    if (errors[id]) {
-      setErrors(prev => ({
-        ...prev,
-        [id]: undefined
-      }));
-    }
-  };
-
-  // Validate form before submission
-  const validateForm = () => {
-    const newErrors = {};
-
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
-
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-
-    // Confirm password validation
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    // Role validation
-    if (!formData.role) {
-      newErrors.role = 'Role is required';
-    }
-
-    // Other required fields
-    const requiredFields = [
-      'address', 
-      'roverRegistrationNumber', 
-      'idNumber', 
-      'crewOrSchool'
-    ];
-
-    requiredFields.forEach(field => {
-      if (!formData[field]?.trim()) {
-        newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
-      }
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setServerError(null);
-
-    // Validate form
-    if (!validateForm()) {
+    setError('');
+    
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
     setIsLoading(true);
 
+    // Remove confirmPassword from data sent to server
+    const submitData = { ...formData };
+    delete submitData.confirmPassword;
+
     try {
-      // Remove confirmPassword before sending to backend
-      const { confirmPassword, ...submitData } = formData;
-      
-      // Call create account service
-      const response = await authService.createAccount(submitData);
-      
-      // Show success message or redirect to login
-      navigate('/login', { 
-        state: { 
-          message: 'Account created successfully. Please log in.' 
-        } 
+      const response = await axios.post("http://localhost:8000/api/account", submitData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
-    } catch (err) {
-      // Handle server errors
-      setServerError(err.message || 'Account creation failed');
+
+      if (response.data) {
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setError(error.response?.data?.message || error.response?.data?.error || 'Failed to create account');
     } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-2xl">
-        <LoginNavbar />
-        
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center">
-            <UserPlusIcon className="w-8 h-8 text-blue-600 mr-2" />
-            <h2 className="text-2xl font-bold">Create Account</h2>
-          </div>
-          <a href="/login" className="text-blue-600 hover:underline">
-            Already have an account? Login
-          </a>
-        </div>
+  // Rest of the component remains the same...
+  const inputClassName = "mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+  const labelClassName = "block text-sm font-medium text-gray-700 mb-2";
 
-        {serverError && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <strong className="font-bold">Error: </strong>
-            <span className="block sm:inline">{serverError}</span>
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-red-50 to-white">
+      <LoginNavbar />
+      <div className="flex items-center justify-center px-4 py-12">      
+        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+          <div>
+            <h2 className="text-center text-3xl font-extrabold text-gray-900">Create Account</h2>
+          </div>
+        {error && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+            <p className="font-medium">{error}</p>
           </div>
         )}
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        
+          <div className="rounded-md shadow-sm space-y-6">
+            <div>
+              <label htmlFor="name" className={labelClassName}>Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={inputClassName}
+                required
+                disabled={isLoading}
+                aria-label="Name"
+              />
+            </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-          {/* Name Input */}
-          <div>
-            <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`w-full border rounded py-2 px-3 focus:outline-none 
-                ${errors.name 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-gray-300 focus:border-blue-500'}`}
-              required
-            />
-            {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-            )}
-          </div>
+            <div>
+              <label htmlFor="email" className={labelClassName}>Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={inputClassName}
+                required
+                disabled={isLoading}
+                aria-label="Email"
+              />
+            </div>
 
-          {/* Email Input */}
-          <div>
-            <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`w-full border rounded py-2 px-3 focus:outline-none 
-                ${errors.email 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-gray-300 focus:border-blue-500'}`}
-              required
-            />
-            {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-            )}
-          </div>
+            <div>
+              <label htmlFor="password" className={labelClassName}>Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={inputClassName}
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
 
-          {/* Password Inputs */}
-          <div>
-            <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={`w-full border rounded py-2 px-3 focus:outline-none 
-                ${errors.password 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-gray-300 focus:border-blue-500'}`}
-              required
-            />
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="confirmPassword" className="block text-gray-700 font-medium mb-2">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className={`w-full border rounded py-2 px-3 focus:outline-none 
-                ${errors.confirmPassword 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-gray-300 focus:border-blue-500'}`}
-              required
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
-            )}
-          </div>
+            <div>
+              <label htmlFor="confirmPassword" className={labelClassName}>Confirm Password</label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={inputClassName}
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
 
-          {/* Other Form Fields (Address, Registration Number, etc.) */}
-          {[
-            { id: 'address', label: 'Address' },
-            { id: 'roverRegistrationNumber', label: 'Rover Registration Number' },
-            { id: 'idNumber', label: 'ID Number' },
-            { id: 'crewOrSchool', label: 'Crew or School' }
-          ].map(({ id, label }) => (
-            <div key={id}>
-              <label htmlFor={id} className="block text-gray-700 font-medium mb-2">
-                {label}
+            <div>
+              <label htmlFor="address" className={labelClassName}>Address</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className={inputClassName}
+                disabled={isLoading}
+                aria-label="Address"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="roverRegistrationNumber" className={labelClassName}>
+                Rover Registration Number
               </label>
               <input
                 type="text"
-                id={id}
-                value={formData[id]}
+                id="roverRegistrationNumber"
+                name="roverRegistrationNumber"
+                value={formData.roverRegistrationNumber}
                 onChange={handleChange}
-                className={`w-full border rounded py-2 px-3 focus:outline-none 
-                  ${errors[id] 
-                    ? 'border-red-500 focus:border-red-500' 
-                    : 'border-gray-300 focus:border-blue-500'}`}
-                required
+                className={inputClassName}
+                disabled={isLoading}
+                aria-label="Rover registration number"
               />
-              {errors[id] && (
-                <p className="text-red-500 text-xs mt-1">{errors[id]}</p>
-              )}
             </div>
-          ))}
 
-          {/* Role Selection */}
-          <div className="col-span-2">
-            <label htmlFor="role" className="block text-gray-700 font-medium mb-2">
-              Role
-            </label>
-            <select
-              id="role"
-              value={formData.role}
-              onChange={handleChange}
-              className={`w-full border rounded py-2 px-3 focus:outline-none 
-                ${errors.role 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'border-gray-300 focus:border-blue-500'}`}
-              required
-            >
-              <option value="">Select a role</option>
-              <option value="admin">Admin</option>
-              <option value="teacher">Teacher</option>
-              <option value="leader">Leader</option>
-            </select>
-            {errors.role && (
-              <p className="text-red-500 text-xs mt-1">{errors.role}</p>
-            )}
-          </div>
+            <div>
+              <label htmlFor="idNumber" className={labelClassName}>ID Number</label>
+              <input
+                type="text"
+                id="idNumber"
+                name="idNumber"
+                value={formData.idNumber}
+                onChange={handleChange}
+                className={inputClassName}
+                disabled={isLoading}
+                aria-label="ID number"
+              />
+            </div>
 
-          {/* Profile Picture Upload */}
-          <div className="col-span-2">
-            <label htmlFor="profilePicture" className="block text-gray-700 font-medium mb-2">
-              Profile Picture
-            </label>
-            <div className="flex items-center">
-              <label
-                htmlFor="profilePicture"
-                className="flex items-center justify-center bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors cursor-pointer"
+            <div>
+              <label htmlFor="crewOrSchool" className={labelClassName}>Crew or School</label>
+              <select
+                id="crewOrSchool"
+                name="crewOrSchool"
+                value={formData.crewOrSchool}
+                onChange={handleChange}
+                className={inputClassName}
+                required
+                disabled={isLoading}
+                aria-label="Crew or school"
               >
-                <ImageIcon className="w-5 h-5 mr-2" />
-                Upload
-              </label>
-              {formData.profilePicture && (
-                <span className="ml-4 text-gray-700">
-                  {formData.profilePicture.name}
-                </span>
-              )}
+                <option value="">Select option</option>
+                <option value="crew">Crew</option>
+                <option value="school">School</option>
+              </select>
             </div>
-            <input
-              type="file"
-              id="profilePicture"
-              accept="image/*"
-              onChange={handleChange}
-              className="hidden"
-            />
+
+            <div>
+              <label htmlFor="role" className={labelClassName}>Role</label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className={inputClassName}
+                required
+                disabled={isLoading}
+                aria-label="Role"
+              >
+                <option value="admin">Admin</option>
+                <option value="teacher">Teacher</option>
+                <option value="leader">Leader</option>
+              </select>
+            </div>
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="col-span-2 w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
-          </button>
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </div>
         </form>
       </div>
+    </div>
     </div>
   );
 };
 
-export default CreateAccountPage;
+export default CreateAccount;

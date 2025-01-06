@@ -1,16 +1,47 @@
+// src/pages/login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 import LoginNavbar from "./loginNavbar";
+import { loginWithEmailAndPassword } from '../components/ui/services/auth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/");
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const { user } = await loginWithEmailAndPassword(email, password);
+      
+      // Store user data in localStorage or state management solution
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Redirect based on role
+      switch (user.role) {
+        case 'admin':
+          navigate('/admin/dashboard');
+          break;
+        case 'teacher':
+          navigate('/teacher/dashboard');
+          break;
+        case 'student':
+          navigate('/student/dashboard');
+          break;
+        default:
+          navigate('/');
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -32,6 +63,13 @@ const LoginPage = () => {
             <div className="text-xl font-semibold text-gray-800">WoodLand Rover Crew</div>
             <div className="text-lg text-gray-600">Welcome Back, Rovers</div>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
 
           {/* Form Section */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,9 +97,10 @@ const LoginPage = () => {
             <div>
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
+                disabled={isLoading}
+                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                Login
+                {isLoading ? 'Logging in...' : 'Login'}
               </button>
             </div>
 
