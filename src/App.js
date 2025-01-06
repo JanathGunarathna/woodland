@@ -18,6 +18,7 @@ import EditProject from './pages/editProject';
 import AddProject from './pages/addProject';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import ProtectedRoute from './components/ui/ProtectedRoute';
+import { UserProvider } from './components/utils/UserContext';
 import './index.css';
 
 const baseUrl = "http://localhost:5000/api";
@@ -63,6 +64,7 @@ function AppContent() {
   const hideNavbar = ['/login', '/create-account', '/forgetPassword', '/OtpPage'].includes(location.pathname);
 
   return (
+    <UserProvider>
     <div className="min-h-screen bg-red-60 py-16">
       <div className="min-h-screen bg-gradient-to-b from-red-50 to-white">
         {!hideNavbar && <MyNavbar userRole={user?.role} />}
@@ -135,6 +137,7 @@ function AppContent() {
         </Routes>
       </div>
     </div>
+    </UserProvider>
   );
 }
 

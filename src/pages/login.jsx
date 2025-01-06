@@ -1,9 +1,8 @@
-// src/pages/login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../App.css";
+import { loginWithEmailAndPassword } from '../components/utils/auth';
+import { useUser } from '../components/utils/UserContext';
 import LoginNavbar from "./loginNavbar";
-import { loginWithEmailAndPassword } from '../components/ui/services/auth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +10,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,9 +19,7 @@ const LoginPage = () => {
 
     try {
       const { user } = await loginWithEmailAndPassword(email, password);
-      
-      // Store user data in localStorage or state management solution
-      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user); // Update global user state
       
       // Redirect based on role
       switch (user.role) {
@@ -31,8 +29,8 @@ const LoginPage = () => {
         case 'teacher':
           navigate('/teacher/dashboard');
           break;
-        case 'student':
-          navigate('/student/dashboard');
+        case 'leader':
+          navigate('/leader/dashboard');
           break;
         default:
           navigate('/');
