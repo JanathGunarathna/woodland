@@ -23,7 +23,7 @@ const LoginPage = () => {
       }
   
       // User authentication
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch('http://localhost:8000/api/account/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,8 +34,8 @@ const LoginPage = () => {
   
       const data = await response.json();
   
-      if (response.ok) {
-        localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.status) {
+        localStorage.setItem('user', JSON.stringify(data.data));
         setIsLoading(false);
         navigate('/user');
       } else {
@@ -46,7 +46,7 @@ const LoginPage = () => {
       setError('An error occurred. Please try again later.');
       setIsLoading(false);
     }
-  };
+};
   
   // Rest of the component remains the same
   return (
