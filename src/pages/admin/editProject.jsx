@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Trash2, ArrowLeft } from 'lucide-react';
-import { Alert, AlertDescription } from '../components/ui/AlertDescription.jsx';
-import MyNavbar from '../pages/MyNavbar.jsx';
+import { Alert, AlertDescription } from '../../components/ui/AlertDescription.jsx';
+import MyNavbar from './MyNavbar.jsx';
 
 const EditProject = () => {
   const navigate = useNavigate();

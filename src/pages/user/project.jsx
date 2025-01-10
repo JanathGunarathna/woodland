@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import MyNavbar from '../pages/MyNavbar.jsx';
+import MyNavbar from './MyUserNavbar';
 import { Calendar, Users, MapPin, ArrowRight } from 'lucide-react';
 
 const Project = () => {

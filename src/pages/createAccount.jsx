@@ -213,7 +213,6 @@ const CreateAccount = () => {
                 disabled={isLoading}
                 aria-label="Crew or school"
               >
-                <option value="">Select option</option>
                 <option value="crew">Crew</option>
                 <option value="school">School</option>
               </select>
@@ -231,7 +230,7 @@ const CreateAccount = () => {
                 disabled={isLoading}
                 aria-label="Role"
               >
-                <option value="admin">Admin</option>
+                <option value="admin">Student</option>
                 <option value="teacher">Teacher</option>
                 <option value="leader">Leader</option>
               </select>

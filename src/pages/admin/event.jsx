@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import MyNavbar from './MyNavbar';
 import { Calendar, MapPin, Clock, Users, ArrowRight, AlertCircle } from 'lucide-react';
-import { Dialog } from '../components/ui/dialog';
-import { Button } from '../components/ui/button';
+import { Dialog } from '../../components/ui/dialog';
+import { Button } from '../../components/ui/button';
 
 const Event = () => {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
@@ -86,6 +86,7 @@ const Event = () => {
       <Dialog open={isOpen} onOpenChange={onClose}>
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-lg max-w-md w-full mx-4 p-6">
+          <MyNavbar />
             <h3 className="text-2xl font-bold mb-4">Register for {event.title}</h3>
             
             <form className="space-y-4">

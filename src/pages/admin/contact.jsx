@@ -13,10 +13,10 @@ import {
   Card,
   CardHeader,
   CardContent,
-} from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Textarea } from "../components/ui/textarea.jsx";
+} from "../../components/ui/card.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { Input } from "../../components/ui/input.jsx";
+import { Textarea } from "../../components/ui/textarea.jsx";
 import MyNavbar from './MyNavbar';
 
 const Contact = () => {

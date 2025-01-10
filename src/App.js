@@ -1,150 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import axios from 'axios';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Page imports
-import Home from './pages/Home';
-import About from './pages/about';
-import Project from './pages/project';
-import Event from './pages/event';
-import Contact from './pages/contact';
-import MyNavbar from './pages/MyNavbar';
-import CreateAccountPage from './pages/createAccount';
-import UserProfilePage from './pages/profile';
+import Home from './pages/admin/Home';
+import UserHome from './pages/user/userHome';
+import About from './pages/admin/about';
+import UserAbout from './pages/user/userAbout';
+import Project from './pages/admin/project';
+import AddProject from './pages/admin/addProject';
+//import AddEvent from './pages/admin/addEvent';
+import UserProject from './pages/user/project';
+import Event from './pages/admin/event';
+import UserEvent from './pages/user/userEvent';
+import Contact from './pages/admin/contact';
+import UserContact from './pages/user/userContact';
+import UserProfile from './pages/user/userProfile';
+import CreateAccount from './pages/createAccount';
 import Login from './pages/login';
 import ForgetPassword from './pages/forgetPassword';
 import OtpPage from './pages/otp';
-import EditProject from './pages/editProject';
-import AddProject from './pages/addProject';
-import UnauthorizedPage from './pages/UnauthorizedPage';
-import ProtectedRoute from './components/ui/ProtectedRoute';
-import { UserProvider } from './components/utils/UserContext';
+import LoginNavbar from './pages/loginNavbar';
 import './index.css';
 
 const baseUrl = "http://localhost:5000/api";
 
-const ROLES = {
-  ADMIN: 'admin',
-  TEACHER: 'teacher',
-  LEADER: 'leader'
-};
-
-function AppContent() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const location = useLocation();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      axios.get(`${baseUrl}/account`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(response => {
-        setUser(response.data.data);
-      })
-      .catch(() => {
-        localStorage.removeItem('token');
-        setUser(null);
-      })
-      .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  const hideNavbar = ['/login', '/create-account', '/forgetPassword', '/OtpPage'].includes(location.pathname);
-
-  return (
-    <UserProvider>
-    <div className="min-h-screen bg-red-60 py-16">
-      <div className="min-h-screen bg-gradient-to-b from-red-50 to-white">
-        {!hideNavbar && <MyNavbar userRole={user?.role} />}
-
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={
-            user ? <Navigate to="/" replace /> : <Login />
-          } />
-          <Route path="/create-account" element={
-            user ? <Navigate to="/" replace /> : <CreateAccountPage />
-          } />
-          <Route path="/forgetPassword" element={<ForgetPassword />} />
-          <Route path="/OtpPage" element={<OtpPage />} />
-          <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-          {/* Protected Routes */}
-          <Route path="/" element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]} userRole={user?.role}>
-              <Home />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/about" element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]} userRole={user?.role}>
-              <About />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/project" element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]} userRole={user?.role}>
-              <Project />
-            </ProtectedRoute>
-          } />
-
-          {/* Admin-only routes */}
-          <Route path="/editProject" element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN]} userRole={user?.role}>
-              <EditProject />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/addProject" element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN]} userRole={user?.role}>
-              <AddProject />
-            </ProtectedRoute>
-          } />
-
-          {/* Mixed-access routes */}
-          <Route path="/event" element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]} userRole={user?.role}>
-              <Event />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/contact" element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]} userRole={user?.role}>
-              <Contact />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/user-profile" element={
-            <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]} userRole={user?.role}>
-              <UserProfilePage />
-            </ProtectedRoute>
-          } />
-          
-          {/* Catch-all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-    </div>
-    </UserProvider>
-  );
-}
 
 function App() {
   return (
     <Router>
-      <AppContent />
+      <div className="min-h-screen bg-red-60 py-16">
+        <div className="min-h-screen bg-gradient-to-b from-red-50 to-white">
+          {!['/login', '/create-account', '/forgetPassword', '/OtpPage'].includes(window.location.pathname) && <LoginNavbar />}
+          
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/create-account" element={<CreateAccount />} />
+            <Route path="/forgetPassword" element={<ForgetPassword />} />
+            <Route path="/OtpPage" element={<OtpPage />} />
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={<Home />} />
+            <Route path="/admin/about" element={<About />} />
+            <Route path="/admin/project" element={<Project />} />
+            <Route path="/admin/event" element={<Event />} />
+            <Route path="/admin/contact" element={<Contact />} />
+            <Route path="/admin/add-project" element={<AddProject />} />
+            {/* <Route path="/admin/add-event" element={<AddEvent />} /> */}
+
+            {/* User Routes */}
+            <Route path="/user" element={<UserHome />} />
+            <Route path="/user/about" element={<UserAbout />} />
+            <Route path="/user/project" element={<UserProject />} />
+            <Route path="/user/profile" element={<UserProfile />} />
+            <Route path="/user/event" element={<UserEvent />} />
+            <Route path="/user/contact" element={<UserContact />} />
+          </Routes>
+        </div>
+      </div>
     </Router>
   );
 }

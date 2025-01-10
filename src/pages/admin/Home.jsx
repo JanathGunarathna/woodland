@@ -1,5 +1,5 @@
 import React from "react";
-import MyNavbar from "../pages/MyNavbar.jsx";
+import MyNavbar from "./MyNavbar";
 
 const Home = () => {
   return (

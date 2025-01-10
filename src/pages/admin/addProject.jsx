@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Calendar, Users, MapPin, X, Save, Trash2 } from 'lucide-react';
-import { Alert, AlertDescription } from '../components/ui/AlertDescription';
+import { Alert, AlertDescription } from '../../components/ui/AlertDescription';
 import axios from 'axios';
+import MyNavbar from "./MyNavbar";
 
 const API_BASE_URL = 'http://localhost:8000/api/projects';
 const ProjectForm = ({ project, onSubmit, onDelete, mode = "create" }) => {
@@ -76,6 +77,7 @@ const ProjectForm = ({ project, onSubmit, onDelete, mode = "create" }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-3xl">
+      <MyNavbar />
         <div className="bg-white rounded-xl shadow-md p-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
