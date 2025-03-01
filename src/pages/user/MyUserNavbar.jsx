@@ -10,12 +10,11 @@ const MyNavbar = () => {
   };
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/project', label: 'Project' },
-    //{ href: '/admin/add-project', label: 'Create Project' },
-    { href: '/event', label: 'Event' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/user', label: 'Home' },
+    { href: '/user/about', label: 'About' },
+    { href: '/user/project', label: 'Project' },
+    { href: '/user/event', label: 'Event' },
+    { href: '/user/contact', label: 'Contact' },
     { href: '/login', label: 'Log out' },
   ];
 

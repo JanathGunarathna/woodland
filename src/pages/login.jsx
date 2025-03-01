@@ -1,53 +1,53 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import LoginNavbar from './loginNavbar';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import LoginNavbar from "./loginNavbar";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-  
+    setError("");
+
     try {
       // Special case for admin
-      if (email === 'admin@gmail.com' && password === 'admin123') {
+      if (email === "admin@gmail.com" && password === "admin123") {
         setIsLoading(false);
-        navigate('/admin');
+        navigate("/admin");
         return;
       }
-  
+
       // User authentication
-      const response = await fetch('http://localhost:8000/api/account/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/api/account/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (data.status) {
-        localStorage.setItem('user', JSON.stringify(data.data));
+        localStorage.setItem("user", JSON.stringify(data.data));
         setIsLoading(false);
-        navigate('/user');
+        navigate("/user");
       } else {
-        setError(data.message || 'Invalid credentials. Please try again.');
+        setError(data.message || "Invalid credentials. Please try again.");
         setIsLoading(false);
       }
     } catch (err) {
-      setError('An error occurred. Please try again later.');
+      setError("An error occurred. Please try again later.");
       setIsLoading(false);
     }
-};
-  
+  };
+
   // Rest of the component remains the same
   return (
     <div className="h-screen flex flex-col bg-gradient-to-b from-red-50 to-white">
@@ -65,7 +65,9 @@ const LoginPage = () => {
 
           {/* Title Section */}
           <div className="text-center mb-6">
-            <div className="text-xl font-semibold text-gray-800">WoodLand Rover Crew</div>
+            <div className="text-xl font-semibold text-gray-800">
+              WoodLand Rover Crew
+            </div>
             <div className="text-lg text-gray-600">Welcome Back, Rovers</div>
           </div>
 
@@ -77,40 +79,54 @@ const LoginPage = () => {
           )}
 
           {/* Form Section */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="form-inp">
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: "1rem" }}>
               <input
                 placeholder="Email Address"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  marginBottom: "10px",
+                }}
                 required
               />
             </div>
-            <div className="form-inp">
+            <div style={{ marginBottom: "1rem" }}>
               <input
                 placeholder="Password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  marginBottom: "10px",
+                }}
                 required
               />
             </div>
-
             <div>
               <button
                 type="submit"
                 disabled={isLoading}
                 className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {isLoading ? 'Logging in...' : 'Login'}
+                {isLoading ? "Logging in..." : "Login"}
               </button>
             </div>
 
             <div className="text-center">
-              <a href="./ForgetPassword" className="text-blue-600 hover:underline">
+              <a
+                href="./ForgetPassword"
+                className="text-blue-600 hover:underline"
+              >
                 Forgot password?
               </a>
             </div>

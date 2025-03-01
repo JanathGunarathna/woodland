@@ -13,7 +13,6 @@ const MyNavbar = () => {
     { href: '/admin', label: 'Home' },
     { href: '/admin/about', label: 'About' },
     { href: '/admin/project', label: 'Project' },
-    { href: '/admin/add-project', label: 'Create Project' },
     { href: '/admin/event', label: 'Event' },
     { href: '/admin/contact', label: 'Contact' },
     { href: '/login', label: 'Log out' },
@@ -31,6 +30,7 @@ const MyNavbar = () => {
               className="w-8 h-8 rounded-full object-cover"
             />
             <span className="ml-2 text-lg font-semibold text-gray-800">Woodland Rovers</span>
+            <span className="ml-2 text-lg font-semibold text-red-900">Admin</span>
           </div>
 
           {/* Desktop Navigation */}

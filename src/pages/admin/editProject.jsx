@@ -1,93 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Save, Trash2, ArrowLeft } from 'lucide-react';
-import { Alert, AlertDescription } from '../../components/ui/AlertDescription.jsx';
-import MyNavbar from './MyNavbar.jsx';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Save, ArrowLeft } from 'lucide-react';
+import { Alert } from '../../components/ui/AlertDescription';
+import axios from 'axios';
+import MyNavbar from './MyNavbar';
 
 const EditProject = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
   
   const [project, setProject] = useState({
-    title: "",
-    category: "",
-    date: "",
-    location: "",
-    participants: "",
-    description: "",
-    image: "",
+    projectName: "",
+    projectDate: "",
+    projectTime: "",
+    projectLocation: "",
+    projectDescription: "",
     status: ""
   });
 
-  // Fetch all projects for the dropdown
   useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      // Replace with your actual API endpoint
-      const response = await fetch('/api/projects');
-      if (!response.ok) throw new Error('Failed to fetch projects');
-      
-      const data = await response.json();
-      setProjects(data);
-    } catch (err) {
-      setError("Failed to load projects list");
-    } finally {
-      setLoading(false);
+    if (id) {
+      fetchProjectDetails();
     }
-  };
+  }, [id]);
 
-  // Fetch selected project details
-  const fetchProjectDetails = async (id) => {
+  const fetchProjectDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/projects/${id}`);
-      if (!response.ok) throw new Error('Failed to fetch project details');
+      console.log(`Fetching project with ID: ${id}`);
+      const response = await axios.get(`http://localhost:8000/api/project/${id}`);
+      console.log("Project data received:", response.data);
       
-      const data = await response.json();
-      setProject(data);
+      // Set all project fields from the response data
+      setProject({
+        projectName: response.data.projectName || "",
+        projectDate: response.data.projectDate || "",
+        projectTime: response.data.projectTime || "",
+        projectLocation: response.data.projectLocation || "",
+        projectDescription: response.data.projectDescription || "",
+        status: response.data.status || ""
+      });
       setError("");
     } catch (err) {
-      setError("Failed to load project details");
-      setProject({
-        title: "",
-        category: "",
-        date: "",
-        location: "",
-        participants: "",
-        description: "",
-        image: "",
-        status: ""
-      });
+      console.error('Error fetching project:', err);
+      setError("Failed to load project details. Please try again.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Handle project selection
-  const handleProjectSelect = (e) => {
-    const id = e.target.value;
-    setSelectedProjectId(id);
-    if (id) {
-      fetchProjectDetails(id);
-    } else {
-      setProject({
-        title: "",
-        category: "",
-        date: "",
-        location: "",
-        participants: "",
-        description: "",
-        image: "",
-        status: ""
-      });
     }
   };
 
@@ -101,65 +62,25 @@ const EditProject = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedProjectId) {
-      setError("Please select a project to edit");
+    setError("");
+    setSuccess("");
+
+    if (!project.projectName || !project.projectDate || !project.projectTime) {
+      setError("Please fill in all required fields");
       return;
     }
 
     try {
-      const response = await fetch(`/api/projects/${selectedProjectId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(project)
-      });
-
-      if (!response.ok) throw new Error('Failed to update project');
-      
+      await axios.put(`http://localhost:8000/api/project/${id}`, project);
       setSuccess("Project updated successfully!");
-      setTimeout(() => navigate('/projects'), 2000);
+      setTimeout(() => navigate('/admin/projects'), 1500);
     } catch (err) {
-      setError("Failed to update project. Please try again.");
+      setError(err.response?.data?.message || "Failed to update project. Please try again.");
+      console.error('Error updating project:', err);
     }
   };
 
-  const handleDelete = async () => {
-    if (!selectedProjectId) {
-      setError("Please select a project to delete");
-      return;
-    }
-
-    if (!window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/projects/${selectedProjectId}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) throw new Error('Failed to delete project');
-      
-      setSuccess("Project deleted successfully!");
-      setSelectedProjectId("");
-      setProject({
-        title: "",
-        category: "",
-        date: "",
-        location: "",
-        participants: "",
-        description: "",
-        image: "",
-        status: ""
-      });
-      setTimeout(() => navigate('/projects'), 2000);
-    } catch (err) {
-      setError("Failed to delete project. Please try again.");
-    }
-  };
-
-  if (loading && !projects.length) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <MyNavbar />
@@ -176,105 +97,123 @@ const EditProject = () => {
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
-          {/* Back Button */}
           <button
-            onClick={() => navigate('/projects')}
+            onClick={() => navigate('/admin/project')}
             className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Projects
           </button>
 
-          {/* Project Selection */}
-          <div className="bg-white rounded-xl shadow-md p-8 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Project to Edit</h2>
-            <select
-              value={selectedProjectId}
-              onChange={handleProjectSelect}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select a project...</option>
-              {projects.map(p => (
-                <option key={p.id} value={p.id}>
-                  {p.title}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Alerts */}
           {error && (
-            <Alert className="mb-4 border-red-200 bg-red-50">
-              <AlertDescription className="text-red-800">{error}</AlertDescription>
+            <Alert variant="destructive" className="mb-4">
+              {error}
             </Alert>
           )}
           
           {success && (
-            <Alert className="mb-4 border-green-200 bg-green-50">
-              <AlertDescription className="text-green-800">{success}</AlertDescription>
+            <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
+              {success}
             </Alert>
           )}
 
-          {/* Edit Form */}
           <div className="bg-white rounded-xl shadow-md p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">Edit Project</h1>
-              {selectedProjectId && (
-                <button
-                  onClick={handleDelete}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  aria-label="Delete project"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              )}
-            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Project</h1>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* ... Rest of the form fields remain the same ... */}
-              {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Title *
+                  Project Name *
                 </label>
                 <input
                   type="text"
-                  name="title"
-                  value={project.title}
+                  name="projectName"
+                  value={project.projectName}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
-                  disabled={!selectedProjectId}
                 />
               </div>
 
-              {/* Category */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date *
+                  </label>
+                  <input
+                    type="text"
+                    name="projectDate"
+                    value={project.projectDate}
+                    onChange={handleChange}
+                    placeholder="e.g., March 15-17, 2024"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Time *
+                  </label>
+                  <input
+                    type="text"
+                    name="projectTime"
+                    value={project.projectTime}
+                    onChange={handleChange}
+                    placeholder="e.g., 9:00 AM - 5:00 PM"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category *
+                  Location
                 </label>
-                <select
-                  name="category"
-                  value={project.category}
+                <input
+                  type="text"
+                  name="projectLocation"
+                  value={project.projectLocation}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                  disabled={!selectedProjectId}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
+                <select
+                  name="status"
+                  value={project.status}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="">Select Category</option>
-                  <option value="Community Service">Community Service</option>
-                  <option value="Education">Education</option>
-                  <option value="Environment">Environment</option>
+                  <option value="">Select Status</option>
+                  <option value="Planning">Planning</option>
+                  <option value="Upcoming">Upcoming</option>
+                  <option value="Completed">Completed</option>
                 </select>
               </div>
 
-              {/* ... Other form fields ... */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  name="projectDescription"
+                  value={project.projectDescription}
+                  onChange={handleChange}
+                  rows="4"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                ></textarea>
+              </div>
 
-              {/* Action Buttons */}
               <div className="flex justify-end space-x-4 pt-4">
                 <button
                   type="button"
-                  onClick={() => navigate('/projects')}
+                  onClick={() => navigate('/admin/projects')}
                   className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Cancel
@@ -282,7 +221,6 @@ const EditProject = () => {
                 <button
                   type="submit"
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-                  disabled={!selectedProjectId}
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Calendar, MapPin, Users } from 'lucide-react';
-// import poorna from "leaders/poorna.jpeg";
-// import mudith from "leaders/mudith.jpg";
-// import praboda from 'leaders/praboda.jpeg';
+import MyUserNavbar from './MyUserNavbar'
 
 const About = () => {
   const leaders = [
@@ -32,6 +30,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-red-60 py-16">
       <div className="container mx-auto px-4">
+        <MyUserNavbar/>
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">

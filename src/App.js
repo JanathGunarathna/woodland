@@ -8,6 +8,7 @@ import About from './pages/admin/about';
 import UserAbout from './pages/user/userAbout';
 import Project from './pages/admin/project';
 import AddProject from './pages/admin/addProject';
+import EditProject from './pages/admin/editProject';
 //import AddEvent from './pages/admin/addEvent';
 import UserProject from './pages/user/project';
 import Event from './pages/admin/event';
@@ -21,6 +22,7 @@ import ForgetPassword from './pages/forgetPassword';
 import OtpPage from './pages/otp';
 import LoginNavbar from './pages/loginNavbar';
 import './index.css';
+import WelcomePage from './pages/welcome';
 
 const baseUrl = "http://localhost:5000/api";
 
@@ -34,6 +36,7 @@ function App() {
           
           <Routes>
             {/* Public Routes */}
+            <Route path="/" element={<WelcomePage/>} />
             <Route path="/login" element={<Login />} />
             <Route path="/create-account" element={<CreateAccount />} />
             <Route path="/forgetPassword" element={<ForgetPassword />} />
@@ -46,6 +49,7 @@ function App() {
             <Route path="/admin/event" element={<Event />} />
             <Route path="/admin/contact" element={<Contact />} />
             <Route path="/admin/add-project" element={<AddProject />} />
+            <Route path="/admin/edit-project/:id" element={<EditProject />} />
             {/* <Route path="/admin/add-event" element={<AddEvent />} /> */}
 
             {/* User Routes */}
